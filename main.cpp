@@ -8,10 +8,11 @@ char szClassName[] = "MainClass";
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
     hInstance = hInst;
     if (!RegClass()) return -1;
-    hMain = CreateWindow(szClassName, "редактор mp3 тегов",
+    hMain = CreateWindowEx(0,szClassName, "редактор Мp3 тегов",
                          WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_MAXIMIZE | WS_VISIBLE,
-                         0, 0, X - 200, Y - 200, NULL,
+                         CW_USEDEFAULT, CW_USEDEFAULT,   X*0.80, Y *0.80, NULL,
                          NULL, hInstance, NULL);
+
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -20,17 +21,21 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 }
 
 int RegClass(void) {
-    WNDCLASS wc;
-    memset(&wc, 0, sizeof(WNDCLASS));
+    WNDCLASSEX wc;
+    memset(&wc, 0, sizeof(WNDCLASSEX));
+    wc.cbSize= sizeof(WNDCLASSEX);
     wc.style = CS_VREDRAW | CS_HREDRAW;
     wc.lpfnWndProc = WndProc;
+    wc.cbClsExtra=0;
+    wc.cbWndExtra=0;
+    wc.hIconSm= LoadIcon(NULL, IDI_APPLICATION);
     wc.hInstance = hInstance;
-    wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = CreateSolidBrush(COLOR_DARK);
+    wc.hbrBackground = CreateSolidBrush(COLOR_WHITE);
     wc.lpszMenuName = (LPSTR)NULL;
     wc.lpszClassName = (LPSTR)szClassName;
-    return RegisterClass(&wc);
+    return RegisterClassEx(&wc);
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -44,7 +49,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
             break;
         case WM_PAINT:
             hdc = BeginPaint(hwnd, &ps);
-            SetBkColor(hdc, COLOR_DARK);
+            SetBkColor(hdc, COLOR_WHITE);
 
             EndPaint(hwnd, &ps);
 
@@ -60,4 +65,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
 void CreateGUIElements(HWND hwnd) {
 
+    //MENU
+    HMENU hMainMenu = CreateMenu();
+    HMENU hPopMenuFile = CreatePopupMenu();
+
+    AppendMenu(hMainMenu, MF_STRING | MF_POPUP, (UINT_PTR)hPopMenuFile, "Файл");
+    AppendMenu(hMainMenu, MF_STRING, 1000, "Настройки");
+    AppendMenu(hMainMenu, MF_STRING, 1001, "Справка");
+
+    AppendMenu(hPopMenuFile, MF_STRING , 1002, "Выбрать папку с файлами");
+    AppendMenu(hPopMenuFile, MF_STRING , 1003, "Отправить данные");
+
+    SetMenu(hwnd, hMainMenu);
+    SetMenu(hwnd, hPopMenuFile);
+    //\MENU
 }

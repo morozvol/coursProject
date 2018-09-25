@@ -12,6 +12,7 @@
 #define X GetSystemMetrics(SM_CXSCREEN)
 #define Y GetSystemMetrics(SM_CYSCREEN)
 #define COLOR_DARK RGB(94,109,125)
+#define COLOR_WHITE RGB(240,240,240)
 
 HINSTANCE hInstance;
 HWND hMain, hAdd, hDelete, hEdit, hOutput, hSort, hSearch, hFiltr;
