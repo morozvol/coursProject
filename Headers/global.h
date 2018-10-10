@@ -15,7 +15,7 @@
 #define COLOR_WHITE RGB(240,240,240)
 
 HINSTANCE hInstance;
-HWND hMain, hTestButton;
+HWND hMain, hListViev;
 MSG msg;
 
 #endif //COURSPROJECT_GLOBAL_H

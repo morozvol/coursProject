@@ -31,7 +31,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
     if (!RegClass()) return -1;
     HMENU hm = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
     hMain = CreateWindow( szClassName, "редактор Мp3 тегов",
-                           WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE,
+                           WS_OVERLAPPEDWINDOW| WS_VISIBLE,
                            CW_USEDEFAULT, CW_USEDEFAULT, X * 0.80, Y  * 0.80, NULL,
                            hm, hInstance, NULL);
 
@@ -64,13 +64,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     switch (message) {
         case WM_CREATE: {
-           CreateGUIElements(hwnd);
             break;
         }
+        case WM_SIZE:
+           ShowWindow(hListViev,SW_HIDE);
+           CreateGUIElements(hwnd);
+            break;
         case WM_PAINT: {
             hdc = BeginPaint(hwnd, &ps);
 
             EndPaint(hwnd, &ps);
+            break;
+        }
+        case WM_GETMINMAXINFO: //Получили сообщение от Винды
+        {
+            MINMAXINFO *pInfo = (MINMAXINFO *)lParam;
+            POINT Min = { X/2, Y/2 };
+            POINT  Max = {X,Y };
+            pInfo->ptMinTrackSize = Min; // Установили минимальный размер
+            pInfo->ptMaxTrackSize = Max; // Установили максимальный размер
             break;
         }
         case WM_DESTROY: {
@@ -85,7 +97,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 }
 
 void CreateGUIElements(HWND hwnd) {
-    CreateListView(hwnd);
+    hListViev= CreateListView(hwnd);
 }
 
 BOOL WINAPI AddListViewItems(HWND hWndLV, int colNum, int textMaxLen, char item[][20]) {
@@ -133,7 +145,7 @@ HWND CreateListView(HWND hwndParent) {
     GetClientRect(hwndParent, &rcClient);
 
     HWND hlwRTView = CreateWindow(WC_LISTVIEW, "",
-                                  WS_CHILD | LVS_REPORT  ,
+                                  WS_CHILD | LVS_REPORT,
                                   0,rcClient.bottom - rcClient.top- (rcClient.bottom - rcClient.top)/2 ,
                                   rcClient.right - rcClient.left ,
                                   (rcClient.bottom - rcClient.top)/2 , hwndParent, (HMENU) IDLW_RT_VIEW, hInstance,
