@@ -3,4 +3,4 @@ project(coursProject)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(coursProject main.cpp Headers/main.h Headers/global.h)
+add_executable(coursProject main.cpp Headers/main.h Headers/global.h Headers/Menu.h Resourses/Menu.rc)
