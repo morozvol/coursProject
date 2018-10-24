@@ -1,12 +1,13 @@
-#include <Windows.h>
-#include "Headers/global.h"
-#include "Headers/main.h"
-#include "Headers/Menu.h"
+#include <windows.h>
+#include "global.h"
+#include "main.h"
+#include "Menu.h"
 #include <iostream>
 #include <io.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <commctrl.h>
+#include <shlobj.h>
 
 #define MENU_ADD        1003
 #define MENU_DELETE     1004
@@ -16,12 +17,14 @@
 using namespace std;
 
 char szClassName[] = "MainClass";
+BROWSEINFO brinfo;
+char dispname[256];
 
 
 HWND CreateListView(HWND hwndParent);
 BOOL WINAPI AddListViewItems(HWND hWndLV, int colNum, int textMaxLen, char item[][20]);
 int SetListViewColumns(HWND hWndLV, int colNum, int textMaxLen, char **header);
-
+void Dialog();
 
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
@@ -64,6 +67,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     switch (message) {
         case WM_CREATE: {
+            brinfo.hwndOwner = NULL;
+            brinfo.lpszTitle = "Browse for folder";
+            brinfo.pszDisplayName =(char *) &dispname;
+            brinfo.ulFlags = BIF_RETURNONLYFSDIRS ;
+            brinfo.lpfn = NULL;
+
             break;
         }
         case WM_SIZE:
@@ -76,7 +85,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
             EndPaint(hwnd, &ps);
             break;
         }
-        case WM_GETMINMAXINFO: //Получили сообщение от Винды
+        case WM_COMMAND:
+            switch (LOWORD(wParam)){
+                case MENU_OPEN_DIRECTORY:
+                    Dialog();
+                    break;
+                case MENU_CLOSE :
+                    PostQuitMessage(0);
+                default:
+                    return DefWindowProc(hwnd, message, wParam, lParam);
+
+            }
+        case WM_GETMINMAXINFO: //Для настройки минимального и максимального размера окна
         {
             MINMAXINFO *pInfo = (MINMAXINFO *)lParam;
             POINT Min = { X/2, Y/2 };
@@ -158,4 +178,13 @@ HWND CreateListView(HWND hwndParent) {
     ShowWindow(hlwRTView,SW_SHOW);
 
     return (hlwRTView);
+}
+void Dialog(){
+    brinfo.hwndOwner = NULL;
+    brinfo.lpszTitle = "Выберите папку";
+    brinfo.pszDisplayName =(char *) &dispname;
+    brinfo.ulFlags = BIF_RETURNONLYFSDIRS ;
+    brinfo.lpfn = NULL;
+
+    SHBrowseForFolder(&brinfo);
 }

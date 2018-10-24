@@ -18,16 +18,13 @@ IDR_MENU1 MENU
 {
     POPUP "Файл"
     {
-        MENUITEM "Открыть", MENU_OPEN
-        MENUITEM "Сохранить", MENU_SAVE
+        MENUITEM "Добавить папку", MENU_OPEN_DIRECTORY
+        MENUITEM "Выбрать папку", MENU_CHOICE_DIRECTORY
         MENUITEM SEPARATOR
         MENUITEM "Выйти", MENU_CLOSE
     }
     POPUP "Сортировать"
     {
-        MENUITEM "По Марке-моделе ", ID_MENU_SORT1
-        MENUITEM "По Марке-моделе в обратном порядке", ID_MENU_SORT2
-        MENUITEM "По Году выпуска  по возрастанию", ID_MENU_SORT3
-        MENUITEM "По Году выпуска по убыванию", ID_MENU_SORT4
+
     }
 }
