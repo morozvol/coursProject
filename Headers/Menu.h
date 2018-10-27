@@ -5,9 +5,10 @@
 #ifndef COURSPROJECT_MENU_H
 #define COURSPROJECT_MENU_H
 
-#define IDR_MENU1                               102
-#define MENU_CLOSE                              40000
-#define MENU_OPEN_DIRECTORY                     40001
-#define MENU_CHOICE_DIRECTORY                   40002
+#define IDR_MENU                                102
+#define MENU_CLOSE                              4000
+#define MENU_OPEN_DIRECTORY                     4001
+#define MENU_CHOICE_DIRECTORY                   4002
+#define ID_UPDATE                               1010
 
 #endif //COURSPROJECT_MENU_H

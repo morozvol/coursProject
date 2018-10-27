@@ -1,43 +1,18 @@
-#include <windows.h>
-#include "global.h"
-#include "main.h"
-#include "Menu.h"
-#include <iostream>
-#include <io.h>
-#include <stdio.h>
-#include <sys/stat.h>
-#include <commctrl.h>
-#include <shlobj.h>
-
-#define MENU_ADD        1003
-#define MENU_DELETE     1004
-#define MENU_EDIT       1005
-#define IDLW_RT_VIEW    3000
+#include <main.h>
 
 using namespace std;
-
-char szClassName[] = "MainClass";
-BROWSEINFO brinfo;
-char dispname[256];
-
-
-HWND CreateListView(HWND hwndParent);
-BOOL WINAPI AddListViewItems(HWND hWndLV, int colNum, int textMaxLen, char item[][20]);
-int SetListViewColumns(HWND hWndLV, int colNum, int textMaxLen, char **header);
-void Dialog();
-
+std::vector< TagLib :: FileRef>tags;
+std::vector<string>dirs;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
- SetConsoleOutputCP(1251);
     hInstance = hInst;
-
+SetConsoleOutputCP(1251);
     if (!RegClass()) return -1;
-    HMENU hm = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
+    HMENU hm = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU));
     hMain = CreateWindow( szClassName, "редактор Мp3 тегов",
                            WS_OVERLAPPEDWINDOW| WS_VISIBLE,
                            CW_USEDEFAULT, CW_USEDEFAULT, X * 0.80, Y  * 0.80, NULL,
                            hm, hInstance, NULL);
-
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -67,17 +42,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     switch (message) {
         case WM_CREATE: {
-            brinfo.hwndOwner = NULL;
-            brinfo.lpszTitle = "Browse for folder";
-            brinfo.pszDisplayName =(char *) &dispname;
-            brinfo.ulFlags = BIF_RETURNONLYFSDIRS ;
-            brinfo.lpfn = NULL;
-
+            //dirs.push_back(R"(C:\Clion\id3Editor\cmake-build-debug)");
+            dirs.push_back(R"(C:\Users\Владимир\Downloads)");
+            loadFileFromFolders();
+            loadListView(hListViev);
             break;
         }
         case WM_SIZE:
            ShowWindow(hListViev,SW_HIDE);
            CreateGUIElements(hwnd);
+            loadListView(hListViev);
             break;
         case WM_PAINT: {
             hdc = BeginPaint(hwnd, &ps);
@@ -87,9 +61,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
         }
         case WM_COMMAND:
             switch (LOWORD(wParam)){
-                case MENU_OPEN_DIRECTORY:
-                    Dialog();
-                    break;
                 case MENU_CLOSE :
                     PostQuitMessage(0);
                 default:
@@ -120,9 +91,8 @@ void CreateGUIElements(HWND hwnd) {
     hListViev= CreateListView(hwnd);
 }
 
-BOOL WINAPI AddListViewItems(HWND hWndLV, int colNum, int textMaxLen, char item[][20]) {
+BOOL WINAPI AddListViewItems(HWND hWndLV, int colNum, int textMaxLen, char item[][31]) {
     int iLastIndex = ListView_GetItemCount(hWndLV);
-
     LVITEM lvi;
     lvi.mask = LVIF_TEXT;
     lvi.cchTextMax = textMaxLen;
@@ -168,23 +138,34 @@ HWND CreateListView(HWND hwndParent) {
                                   WS_CHILD | LVS_REPORT,
                                   0,rcClient.bottom - rcClient.top- (rcClient.bottom - rcClient.top)/2 ,
                                   rcClient.right - rcClient.left ,
-                                  (rcClient.bottom - rcClient.top)/2 , hwndParent, (HMENU) IDLW_RT_VIEW, hInstance,
+                                  (rcClient.bottom - rcClient.top)/2 , hwndParent, (HMENU) ID_LW_RT_VIEW, hInstance,
                                   nullptr);
-    ListView_SetExtendedListViewStyleEx(hlwRTView, 0, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+
     ShowWindow(hlwRTView,SW_SHOW);
     char *header[5] = {"Название","Автор", "Альбом", "Год выпуска", "Жанр"};
-    SetListViewColumns(hlwRTView, 5, 25, header);
-
+    SetListViewColumns(hlwRTView, 5, 31, header);
+    ListView_SetExtendedListViewStyleEx(hlwRTView, 0, LVS_EX_GRIDLINES);
     ShowWindow(hlwRTView,SW_SHOW);
 
     return (hlwRTView);
 }
-void Dialog(){
-    brinfo.hwndOwner = NULL;
-    brinfo.lpszTitle = "Выберите папку";
-    brinfo.pszDisplayName =(char *) &dispname;
-    brinfo.ulFlags = BIF_RETURNONLYFSDIRS ;
-    brinfo.lpfn = NULL;
+void loadListView(HWND hwndParent) {
+    ListView_DeleteAllItems(hwndParent);
+    char  buffer[5][31];
+    memset(buffer, 0, sizeof(buffer));
+    for (int i = 0; i < tags.size(); i++) {
+        strcpy(buffer[0],convert(tags[i].tag()->artist().toCString(1), "utf-8", "cp1251"));
+        strcpy(buffer[1],convert(tags[i].tag()->genre().toCString(1), "utf-8", "cp1251"));
+        strcpy(buffer[2],convert(tags[i].tag()->comment().toCString(1), "utf-8", "cp1251"));
+        strcpy(buffer[3],convert(tags[i].tag()->album().toCString(1), "utf-8", "cp1251"));
+        strcpy(buffer[4],convert(tags[i].tag()->title().toCString(1), "utf-8", "cp1251"));
 
-    SHBrowseForFolder(&brinfo);
+        AddListViewItems(hListViev, 5, 31, buffer);
+    }
+}
+void loadFileFromFolders(){
+    for(int i=0;i<dirs.size();i++){
+        ScanFolder((LPTSTR)dirs[i].c_str());
+    }
+
 }

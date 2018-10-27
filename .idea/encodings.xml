@@ -2,6 +2,7 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/CMakeLists.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/Headers/ReadTag.h" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/Headers/global.h" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/Headers/main.h" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/Resourses/Menu.rc" charset="windows-1251" />

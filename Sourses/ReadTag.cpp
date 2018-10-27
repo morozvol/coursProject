@@ -1,24 +1,85 @@
-//
-// Created by Владимир on 24.10.2018.
-//
 #include "ReadTag.h"
-#include <iostream>
-#include "fileref.h"
-#include "taglib.h"
-using namespace std;
-string name =R"(C:/Clion/id3Editor/cmake-build-debug/song1.mp3)";
-string name1 =R"(C:/Users/Владимир/Downloads/Shahriyor-Ayt-qachon.mp3)";
-int main(){
-     TagLib :: FileRef f ( name.c_str() );
-     f.tag () -> setAlbum ( "Fillmore East" );
-     f.tag () -> setArtist ( "Fill" );
-     f.tag () -> setComment ( "ghghgggggggggggggyuf7uyifugugughuhihjo" );
-     f.tag () -> setYear (1256);
-     f.save ();
-    TagLib :: FileRef g ( name1.c_str() );
-    cout<< g.tag() ->year()<<endl<<g.tag()->album()<<endl<<g.tag()->artist()<<endl<<g.tag()->comment()<<endl<<endl<<g.tag()->genre()<<endl<<g.tag()->title()<<endl<<g.tag()->track()<<"\n\n\n";
-    cout<< f.tag() ->year()<<endl<<f.tag()->album()<<endl<<f.tag()->artist()<<endl<<f.tag()->comment()<<endl<<f.tag()->genre()<<endl<<f.tag()->title()<<endl<<f.tag()->track();
+#include <iconv.h>
+#include <tchar.h>
 
-    return 0;
+using namespace std;
+
+void Add_MP3_Tag(string name,vector<TagLib :: FileRef> t){
+    TagLib :: FileRef f ( name.c_str() );
+    cout<<"Add MP3 File: "<<convert(f.file()->name().toString().toCString(1), "utf-8", "cp1251");
+    t.push_back(f);
+    cout<<"\t ok!"<<endl;
+}
+void Add_MP3_Tag(wstring name,vector<TagLib :: FileRef> t){
+    TagLib :: FileRef f ( name.c_str() );
+    cout<<"Add MP3 File: "<<convert(f.file()->name().toString().toCString(1), "utf-8", "cp1251");
+    t.push_back(f);
+    cout<<"\t ok!"<<endl;
+}
+void Add_MP3_Tag(const char* name,vector<TagLib :: FileRef> t){
+    TagLib :: FileRef f ( name );
+    cout<<"Add MP3 File: "<<convert(f.file()->name().toString().toCString(1), "utf-8", "cp1251");
+    tags.push_back(f);
+    cout<<"\t ok!"<<endl;
+    return;
+}
+void Add_MP3_Tag(const wchar_t* name,vector<TagLib :: FileRef> t){
+    TagLib :: FileRef f ( name );
+    cout<<"Add MP3 File: "<<convert(f.file()->name().toString().toCString(1), "utf-8", "cp1251");
+    tags.push_back(f);
+    cout<<"\t ok!"<<endl;
+}
+char* convert(const char* s, const char* from_cp, const char* to_cp)
+{
+    iconv_t ic = iconv_open(to_cp, from_cp);
+
+    if (ic == (iconv_t)(-1)) {
+        fprintf(stderr, "iconv: cannot convert from %s to %s\n", from_cp, to_cp);
+        return "";
+    }
+
+    char* out_buf = (char*)calloc(strlen(s)+1, 1);
+    char* out = out_buf;
+    char* in = (char*)malloc(strlen(s)+1);
+    strcpy(in, s);
+
+    size_t in_ln = strlen(s);
+    size_t out_ln = in_ln;
+    size_t k = iconv(ic, &in, &in_ln, &out, &out_ln);
+    if(k == (size_t)-1)
+        fprintf(stderr, "iconv: %u of %d converted\n", k, strlen(s));
+
+    if(errno != 0)
+        fprintf(stderr, "iconv: %s\n", strerror(errno));
+
+    iconv_close(ic);
+
+    return out_buf;
 }
 
+void ScanFolder(LPTSTR pFolder)
+{
+    LPCSTR pMask="*.mp3";
+    size_t nLen = _tcslen(pFolder);
+    pFolder[nLen++] = '\\';
+    auto p=pFolder;
+
+    WIN32_FIND_DATA fd;
+    HANDLE hf;
+
+// Файлы по маске
+    _tcscpy(pFolder + nLen, pMask);
+    hf = FindFirstFile(pFolder, &fd);
+    if ( hf != INVALID_HANDLE_VALUE )
+    {
+        do
+        {
+            if ( !(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
+            {
+                _tcscpy(p + nLen, fd.cFileName);
+                cout<<p<<endl;
+            }
+        } while( FindNextFile(hf, &fd) );
+        FindClose(hf);
+    }
+}
