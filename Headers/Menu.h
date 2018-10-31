@@ -9,6 +9,8 @@
 #define MENU_CLOSE                              4000
 #define MENU_OPEN_DIRECTORY                     4001
 #define MENU_CHOICE_DIRECTORY                   4002
+#define MENU_UPDATE                             4003
+#define MENU_SETTINGS                           4004
 #define ID_UPDATE                               1010
 
 #endif //COURSPROJECT_MENU_H

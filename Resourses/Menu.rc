@@ -10,7 +10,9 @@
      {
          MENUITEM "Добавить папку", MENU_OPEN_DIRECTORY
          MENUITEM "Выбрать папку", MENU_CHOICE_DIRECTORY
+         MENUITEM "Обновить", MENU_UPDATE
          MENUITEM SEPARATOR
          MENUITEM "Выйти", MENU_CLOSE
      }
+      MENUITEM "Настройки", MENU_SETTINGS
  }

@@ -14,10 +14,7 @@
 #include "tag.h"
 using namespace std;
 
-void Add_MP3_Tag(string name, vector<TagLib :: FileRef> t);
-void Add_MP3_Tag(wstring name,vector<TagLib :: FileRef> t);
-void Add_MP3_Tag(const char* name,vector<TagLib :: FileRef> t);
-void Add_MP3_Tag(const wchar_t* name,vector<TagLib :: FileRef> t);
+void Add_MP3_Tag(wstring name);
 char* convert(const char* s, const char* from_cp, const char* to_cp);
-void ScanFolder(LPTSTR pFolder);
+void ScanFolder(wstring pFolder);
 #endif //COURSPROJECT_READTAG_H

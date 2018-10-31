@@ -1,41 +1,22 @@
 #include "ReadTag.h"
 #include <iconv.h>
 #include <tchar.h>
+#include <tfile.h>
 
 using namespace std;
 
-void Add_MP3_Tag(string name,vector<TagLib :: FileRef> t){
+void Add_MP3_Tag(wstring name){
     TagLib :: FileRef f ( name.c_str() );
-    cout<<"Add MP3 File: "<<convert(f.file()->name().toString().toCString(1), "utf-8", "cp1251");
-    t.push_back(f);
-    cout<<"\t ok!"<<endl;
-}
-void Add_MP3_Tag(wstring name,vector<TagLib :: FileRef> t){
-    TagLib :: FileRef f ( name.c_str() );
-    cout<<"Add MP3 File: "<<convert(f.file()->name().toString().toCString(1), "utf-8", "cp1251");
-    t.push_back(f);
-    cout<<"\t ok!"<<endl;
-}
-void Add_MP3_Tag(const char* name,vector<TagLib :: FileRef> t){
-    TagLib :: FileRef f ( name );
-    cout<<"Add MP3 File: "<<convert(f.file()->name().toString().toCString(1), "utf-8", "cp1251");
     tags.push_back(f);
-    cout<<"\t ok!"<<endl;
-    return;
 }
-void Add_MP3_Tag(const wchar_t* name,vector<TagLib :: FileRef> t){
-    TagLib :: FileRef f ( name );
-    cout<<"Add MP3 File: "<<convert(f.file()->name().toString().toCString(1), "utf-8", "cp1251");
-    tags.push_back(f);
-    cout<<"\t ok!"<<endl;
-}
+
 char* convert(const char* s, const char* from_cp, const char* to_cp)
 {
     iconv_t ic = iconv_open(to_cp, from_cp);
 
     if (ic == (iconv_t)(-1)) {
         fprintf(stderr, "iconv: cannot convert from %s to %s\n", from_cp, to_cp);
-        return "";
+        return (char*)("");
     }
 
     char* out_buf = (char*)calloc(strlen(s)+1, 1);
@@ -57,29 +38,18 @@ char* convert(const char* s, const char* from_cp, const char* to_cp)
     return out_buf;
 }
 
-void ScanFolder(LPTSTR pFolder)
+void ScanFolder(wstring folderpath)
 {
-    LPCSTR pMask="*.mp3";
-    size_t nLen = _tcslen(pFolder);
-    pFolder[nLen++] = '\\';
-    auto p=pFolder;
-
-    WIN32_FIND_DATA fd;
-    HANDLE hf;
-
-// Файлы по маске
-    _tcscpy(pFolder + nLen, pMask);
-    hf = FindFirstFile(pFolder, &fd);
-    if ( hf != INVALID_HANDLE_VALUE )
+    setlocale(LC_ALL, "");
+    WIN32_FIND_DATAW wfd;
+    HANDLE  hFind = FindFirstFileW((L"\\\\?\\" + folderpath+L"\\*mp3").c_str(), &wfd);
+    if (INVALID_HANDLE_VALUE != hFind)
     {
         do
         {
-            if ( !(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
-            {
-                _tcscpy(p + nLen, fd.cFileName);
-                cout<<p<<endl;
-            }
-        } while( FindNextFile(hf, &fd) );
-        FindClose(hf);
+           Add_MP3_Tag(folderpath+L"\\"+wstring(&wfd.cFileName[0]));
+        } while ((BOOL)NULL != FindNextFileW(hFind, &wfd));
+
+        FindClose(hFind);
     }
 }
