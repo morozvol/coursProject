@@ -30,7 +30,7 @@ int RegClass() {
     wc.hInstance = hInstance;
     wc.hIcon = LoadIcon(nullptr, IDI_WINLOGO);
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);
+    wc.hbrBackground = (HBRUSH)(1);
     wc.lpszMenuName = (LPSTR)nullptr;
     wc.lpszClassName = (LPSTR)szClassName;
     return RegisterClass(&wc);
@@ -42,7 +42,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
             break;
         }
         case WM_SIZE:
+            GetWindowRect(hwnd,&rcClient);
             ShowWindow(hListViev,SW_HIDE);
+            if(!CreateEditWindow((int)((rcClient.right-rcClient.left)*0.75)-12, 0, (int)((rcClient.right-rcClient.left)-(rcClient.right-rcClient.left)*0.75),rcClient.bottom-rcClient.top-60,hwnd))MessageBox(nullptr,"","",MB_OK);
+            hListViev = CreateListView(hwnd);
             CreateGUIElements(hwnd);
             loadListView(hListViev);
             break;
@@ -121,54 +124,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 }
 
 void CreateGUIElements(HWND hwnd) {
-    hListViev = CreateListView(hwnd);
-    hComboBox=CreateWindow("combobox", nullptr, WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | CBS_DROPDOWN |
-                                             CBS_DROPDOWNLIST | CBS_SORT,0, rcClient.bottom - rcClient.top -25, (int)((rcClient.right - rcClient.left)*0.75)-25,120,
-                           hwnd, (HMENU)ID_COMBOBOX_DIRS,hInstance,nullptr);
-    hButton=CreateWindow("button", "+", WS_CHILD | WS_VISIBLE, (int)((rcClient.right - rcClient.left)*0.75)-25, rcClient.bottom - rcClient.top -25, 25,25,
-                         hwnd, (HMENU)ID_BUTTON,hInstance,nullptr);
+   // GetWindowRect(hwnd,&rcClient);
+    int wLV = (int) ((rcClient.right - rcClient.left) * 0.75);
+    int hLV = (int) (rcClient.bottom - rcClient.top);
+    hComboBox = CreateWindow("combobox", nullptr,
+                             WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | CBS_DROPDOWN |
+                             CBS_DROPDOWNLIST | CBS_SORT, 0, hLV - 25, wLV - 25, 120,
+                             hwnd, (HMENU) ID_COMBOBOX_DIRS, hInstance, nullptr);
+    hButton = CreateWindow("button", "+", WS_CHILD | WS_VISIBLE, wLV - 25, hLV - 25, 25, 25,
+                           hwnd, (HMENU) ID_BUTTON, hInstance, nullptr);
 
-
-    CreateWindow("static", "название:", WS_CHILD | WS_VISIBLE, (int)((rcClient.right - rcClient.left)*0.75)+5, 10, 70,14,
-                 hwnd, nullptr,hInstance,nullptr);
-    CreateWindow("static", "исполнитель:", WS_CHILD | WS_VISIBLE, (int)((rcClient.right - rcClient.left)*0.75)+5, 40, 90,14,
-                 hwnd, nullptr,hInstance,nullptr);
-    CreateWindow("static", "альбом:", WS_CHILD | WS_VISIBLE,(int) ((rcClient.right - rcClient.left)*0.75)+5, 70, 60,14,
-                 hwnd, nullptr,hInstance,nullptr);
-    CreateWindow("static", "жанр:", WS_CHILD | WS_VISIBLE, (int)((rcClient.right - rcClient.left)*0.75)+5, 100, 45,14,
-                 hwnd, nullptr,hInstance,nullptr);
-    CreateWindow("static", "коментарий:", WS_CHILD | WS_VISIBLE, (int)((rcClient.right - rcClient.left)*0.75)+5, 130, 85,14,
-                 hwnd, nullptr,hInstance,nullptr);
-    CreateWindow("static", "год:", WS_CHILD | WS_VISIBLE, (int)((rcClient.right - rcClient.left)*0.75)+5, 160, 40,14,
-                 hwnd, nullptr,hInstance,nullptr);
-    CreateWindow("static", "номер трека в плейлисте:", WS_CHILD | WS_VISIBLE,(int) ((rcClient.right - rcClient.left)*0.75)+5, 190, 175,14,
-                 hwnd, nullptr,hInstance,nullptr);
-    CreateWindow("static", "путь к файлу:", WS_CHILD | WS_VISIBLE, (int)((rcClient.right - rcClient.left)*0.75)+5,  rcClient.bottom - rcClient.top -50, 100,14,
-                 hwnd, nullptr,hInstance,nullptr);
-    CreateWindow("static", "Simple Rate:", WS_CHILD | WS_VISIBLE, (int)((rcClient.right - rcClient.left)*0.75)+5, rcClient.bottom - rcClient.top -20, 100,14,
-                 hwnd, nullptr,hInstance,nullptr);
-    CreateWindow("static", "битрейт:", WS_CHILD | WS_VISIBLE, (int)((rcClient.right - rcClient.left)*0.75)+5,  rcClient.bottom - rcClient.top -80, 100,14,
-                 hwnd, nullptr,hInstance,nullptr);
-    CreateWindow("static", "длинна трека:", WS_CHILD | WS_VISIBLE,(int) ((rcClient.right - rcClient.left)*0.75)+5,  rcClient.bottom - rcClient.top -110, 100,14,
-                 hwnd, nullptr,hInstance,nullptr);
-
-
-    hEditTitle=CreateWindow("edit", "", WS_CHILD | WS_VISIBLE | WS_BORDER, (int)((rcClient.right - rcClient.left)*0.75)+105, 10, 140,20,
-                            hwnd, nullptr,hInstance,nullptr);
-    hEditName=CreateWindow("edit", "", WS_CHILD | WS_VISIBLE | WS_BORDER, (int)((rcClient.right - rcClient.left)*0.75)+105, 40, 140,20,
-                           hwnd, nullptr,hInstance,nullptr);
-    hEditAlbom=CreateWindow("edit", "", WS_CHILD | WS_VISIBLE | WS_BORDER, (int)((rcClient.right - rcClient.left)*0.75)+105, 70, 140,20,
-                           hwnd, nullptr,hInstance,nullptr);
-    hEditGenre=CreateWindow("edit", "", WS_CHILD | WS_VISIBLE | WS_BORDER, (int)((rcClient.right - rcClient.left)*0.75)+105, 100, 140,20,
-                           hwnd, nullptr,hInstance,nullptr);
-    hEditComment=CreateWindow("edit", "", WS_CHILD | WS_VISIBLE | WS_BORDER, (int)((rcClient.right - rcClient.left)*0.75)+105, 130, 140,20,
-                           hwnd, nullptr,hInstance,nullptr);
-    hEditYear=CreateWindow("edit", "", WS_CHILD | WS_VISIBLE | WS_BORDER, (int)((rcClient.right - rcClient.left)*0.75)+105, 160, 140,20,
-                           hwnd, nullptr,hInstance,nullptr);
-    hEditNumber=CreateWindow("edit", "", WS_CHILD | WS_VISIBLE | WS_BORDER, (int)((rcClient.right - rcClient.left)*0.75)+200, 190,45,20,
-                           hwnd, nullptr,hInstance,nullptr);
 }
-
 
 BOOL WINAPI AddListViewItems(HWND hWndLV, int colNum, int textMaxLen, char  item[][400]) {
     int iLastIndex = ListView_GetItemCount(hWndLV);
@@ -211,7 +177,7 @@ HWND CreateListView(HWND hwndParent) {
                                   WS_CHILD | LVS_REPORT | LVS_SHOWSELALWAYS,
                                   0,0,
                                   (int)((rcClient.right - rcClient.left)*0.75) ,
-                                  rcClient.bottom - rcClient.top - 25 , hwndParent, (HMENU) ID_LW_RT_VIEW, hInstance,
+                                  rcClient.bottom-rcClient.top - 25 , hwndParent, (HMENU) ID_LW_RT_VIEW, hInstance,
                                   nullptr);
 
     ShowWindow(hlwRTView,SW_SHOW);
@@ -294,12 +260,12 @@ vector<int>GetSelectetItems(){
     return i;
 }
 void loadToEdit( TagLib :: FileRef file){
-   SetWindowText(hEditTitle,convert(file.tag()->title().toCString(TRUE), "utf-8", "cp1251"));
-   SetWindowText(hEditName,convert(file.tag()->artist().toCString(TRUE), "utf-8", "cp1251"));
-   SetWindowText(hEditAlbom,convert(file.tag()->album().toCString(TRUE), "utf-8", "cp1251"));
-   SetWindowText(hEditGenre,convert(file.tag()->genre().toCString(TRUE), "utf-8", "cp1251"));
-   SetWindowText(hEditComment,convert(file.tag()->comment().toCString(TRUE), "utf-8", "cp1251"));
-   SetWindowText(hEditYear,to_string(file.tag()->year()).c_str());
-   SetWindowText(hEditNumber,to_string(file.tag()->track()).c_str());
+   SetWindowText(hComboBoxTitle,convert(file.tag()->title().toCString(TRUE), "utf-8", "cp1251"));
+   SetWindowText(hComboBoxName,convert(file.tag()->artist().toCString(TRUE), "utf-8", "cp1251"));
+   SetWindowText(hComboBoxAlbom,convert(file.tag()->album().toCString(TRUE), "utf-8", "cp1251"));
+   SetWindowText(hComboBoxGenre,convert(file.tag()->genre().toCString(TRUE), "utf-8", "cp1251"));
+   SetWindowText(hComboBoxComment,convert(file.tag()->comment().toCString(TRUE), "utf-8", "cp1251"));
+   SetWindowText(hComboBoxYear,to_string(file.tag()->year()).c_str());
+   SetWindowText(hComboBoxNumber,to_string(file.tag()->track()).c_str());
 
 }

@@ -24,8 +24,11 @@
 
 
 extern HINSTANCE hInstance;
-extern HWND hMain, hListViev;
+extern HWND hMain, hListViev, hComboBox, hButton, hComboBoxTitle, hComboBoxName,hComboBoxAlbom,hComboBoxGenre,hComboBoxComment,hComboBoxYear, hComboBoxNumber;
 extern MSG msg;
 extern std::vector< TagLib :: FileRef>tags;
+
+
+bool CreateEditWindow(int sX, int sY, int x, int y,HWND parent);
 
 #endif //COURSPROJECT_GLOBAL_H

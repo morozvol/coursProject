@@ -42,7 +42,7 @@ BROWSEINFOW brinfo;
 HINSTANCE hInstance;
 
 MSG msg;
-HWND hMain, hListViev, hComboBox, hButton, hEditTitle, hEditName,hEditAlbom,hEditGenre,hEditComment,hEditYear, hEditNumber;
+HWND hMain, hListViev, hComboBox, hButton, hComboBoxTitle, hComboBoxName,hComboBoxAlbom,hComboBoxGenre,hComboBoxComment,hComboBoxYear, hComboBoxNumber;
 wchar_t FileName[300];
 RECT rcClient;
 #endif //COURSPROJECT_MAIN_H
