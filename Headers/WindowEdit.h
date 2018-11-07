@@ -8,8 +8,10 @@
 #include "windows.h"
 #include "global.h"
 
-
 void CreateEditElements(HWND hwnd);
+
 LRESULT CALLBACK EditProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
 void HideGUI();
+
 #endif //COURSPROJECT_WINDOWEDIT_H

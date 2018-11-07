@@ -12,9 +12,13 @@
 #include "fileref.h"
 #include "taglib.h"
 #include "tag.h"
+
 using namespace std;
 
 void Add_MP3_Tag(wstring name);
-char* convert(const char* s, const char* from_cp, const char* to_cp);
+
+char *convert(const char *s, const char *from_cp, const char *to_cp);
+
 void ScanFolder(wstring pFolder);
+
 #endif //COURSPROJECT_READTAG_H
