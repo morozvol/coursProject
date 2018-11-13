@@ -1,9 +1,8 @@
 #include <main.h>
-#include <cstring>
 
 EditTag editMyTag;
 using namespace std;
-std::vector<TagLib::FileRef> tags;
+std::vector<File> file;
 std::vector<wstring> dirs;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
@@ -53,6 +52,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
             hListViev = CreateListView(hwnd);
             CreateGUIElements(hwnd);
             loadListView(hListViev);
+
+            // ListView_DeleteAllItems(hListViev);
             break;
         case WM_NOTIFY: {
             auto pnmhdr = (LPNMHDR) lParam;
@@ -76,9 +77,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 case LVN_ITEMCHANGED: {//Обработчик события выбора элемента
                     vector<int> i = GetSelectetItems();
                     if (i.size() == 1) {
-                                loadToEdit(tags[i[0]]);
+                        for (auto &t : hCBox) {
+                            SendMessage(t, CB_RESETCONTENT, 0, 0L);
+                            SendMessage(t, CB_ADDSTRING, 0, (LPARAM) "");
+                        }
+                        loadToEdit(file[i[0]].taglibFile);
                     } else {
-
+                        for (auto &t : hCBox) {
+                            SendMessage(t, CB_RESETCONTENT, 0, 0L);
+                            SendMessage(t, CB_ADDSTRING, 0, (LPARAM) "<оставить>");
+                        }
                     }
                     break;
                 }
@@ -210,30 +218,19 @@ HWND CreateListView(HWND hwndParent) {
 
 void loadListView(HWND hwndParent) {
     ListView_DeleteAllItems(hwndParent);
+    for (auto &f : file)
+        AddListViewItems(hListViev, 7, 400, f.loadLV);
+    int s = SendMessage(hListViev, LVM_GETCOUNTPERPAGE, 0, 0);
     char buffer[7][400];
     memset(buffer, 0, sizeof(buffer));
-    for (auto &tag : tags) {
-        strcpy(buffer[0], convert(tag.tag()->title().toCString(TRUE), "utf-8", "cp1251"));
-        strcpy(buffer[1], convert(tag.tag()->artist().toCString(TRUE), "utf-8", "cp1251"));
-        strcpy(buffer[2], convert(tag.tag()->album().toCString(TRUE), "utf-8", "cp1251"));
-        strcpy(buffer[3], convert(tag.tag()->genre().toCString(TRUE), "utf-8", "cp1251"));
-        strcpy(buffer[4], to_string(tag.tag()->year()).c_str());
-        strcpy(buffer[5], convert(tag.tag()->comment().toCString(TRUE), "utf-8", "cp1251"));
-        strcpy(buffer[6], convert(tag.file()->name().toString().toCString(TRUE), "utf-8", "cp1251"));
-
-        AddListViewItems(hListViev, 7, 400, buffer);
-
-    }
-    int s = SendMessage(hListViev, LVM_GETCOUNTPERPAGE, 0, 0);
-    for (int i = tags.size(); i < s + 1; i++) {
-        strcpy(buffer[0], "");
-        strcpy(buffer[1], "");
-        strcpy(buffer[2], "");
-        strcpy(buffer[3], "");
-        strcpy(buffer[4], "");
-        strcpy(buffer[5], "");
-        strcpy(buffer[6], "");
-
+    strcmp(buffer[0], "");
+    strcmp(buffer[1], "");
+    strcmp(buffer[2], "");
+    strcmp(buffer[3], "");
+    strcmp(buffer[4], "");
+    strcmp(buffer[5], "");
+    strcmp(buffer[6], "");
+    for (int i = file.size(); i < s + 1; i++) {
         AddListViewItems(hListViev, 7, 400, buffer);
     }
 
@@ -260,12 +257,11 @@ void Dialog(HWND hwnd) {
         dirs.emplace_back(folderpath);
         SendMessage(hComboBox, CB_ADDSTRING, 0, (LPARAM) folderpath);
         update();
-
     }
 }
 
 void update() {
-    tags.clear();
+    file.clear();
     loadFileFromFolders();
     loadListView(hListViev);
 }
@@ -273,7 +269,7 @@ void update() {
 vector<int> GetSelectetItems() {
     vector<int> i;
     int iPos = ListView_GetNextItem(hListViev, -1, LVNI_SELECTED);
-    while (iPos != -1 && iPos < tags.size()) {
+    while (iPos != -1 && iPos < file.size()) {
         i.push_back(iPos);
         iPos = ListView_GetNextItem(hListViev, iPos, LVNI_SELECTED);
     }
@@ -294,16 +290,24 @@ bool is_ok(int ok) {
     return ok == IDOK;
 }
 
-void updateFile(TagLib::FileRef f) {
+void updateFile(File *f) {
 
-    f.tag()->setTitle(string(editMyTag.Title));
-    f.tag()->setArtist(string(editMyTag.Name));
-    f.tag()->setAlbum(string(editMyTag.Album));
-    f.tag()->setGenre(string(editMyTag.Genre));
-    f.tag()->setComment(string(editMyTag.Comment));
-    f.tag()->setYear((unsigned int) stol(editMyTag.Year));
-    f.tag()->setTrack((unsigned int) stol(editMyTag.Number));
-    f.save();
+    f->taglibFile.tag()->setTitle(string(editMyTag.Title));
+    f->taglibFile.tag()->setArtist(string(editMyTag.Name));
+    f->taglibFile.tag()->setAlbum(string(editMyTag.Album));
+    f->taglibFile.tag()->setGenre(string(editMyTag.Genre));
+    f->taglibFile.tag()->setComment(string(editMyTag.Comment));
+    f->taglibFile.tag()->setYear((unsigned int) stol(editMyTag.Year));
+    f->taglibFile.tag()->setTrack((unsigned int) stol(editMyTag.Number));
+    f->taglibFile.save();
+
+    strcpy(f->loadLV[0], editMyTag.Title);
+    strcpy(f->loadLV[1], editMyTag.Name);
+    strcpy(f->loadLV[2], editMyTag.Album);
+    strcpy(f->loadLV[3], editMyTag.Genre);
+    strcpy(f->loadLV[4], editMyTag.Comment);
+    strcpy(f->loadLV[5], editMyTag.Year);
+    strcpy(f->loadLV[6], editMyTag.Number);
 }
 
 void editTags() {
@@ -314,7 +318,7 @@ void editTags() {
             ok = MessageBox(hMain, "Вы точно хотите изменить выделенный файл", "Внимание",
                             MB_OKCANCEL | MB_ICONQUESTION);
         } else {
-            ok = MessageBox(hMain, "Вы точно хотите изменить выделенные файлы", "Внимание",
+            ok = MessageBox(hMain, "Вы точно хотите изменить выделенные файлы?", "Внимание",
                             MB_OKCANCEL | MB_ICONQUESTION);
         }
         if (is_ok(ok)) {
@@ -326,8 +330,8 @@ void editTags() {
             GetWindowText(hCBox[5], editMyTag.Year, 6);
             GetWindowText(hCBox[6], editMyTag.Number, 5);
 
-            for (int i = 0; i < s.size(); i++) {
-                updateFile(tags[s[i]]);
+            for (int i : s) {
+                updateFile(&file[i]);
             }
             loadListView(hListViev);
         }

@@ -79,36 +79,42 @@ void CreateEditElements(HWND hwnd) {
                  hwnd, nullptr, hInstance, nullptr);
     CreateWindow("static", "номер трека в плейлисте:", WS_CHILD | WS_VISIBLE, 5, 190, 175, 14,
                  hwnd, nullptr, hInstance, nullptr);
-    CreateWindow("static", "путь к файлу:", WS_CHILD | WS_VISIBLE, 5, y - 50, 100, 14,
-                 hwnd, nullptr, hInstance, nullptr);
     CreateWindow("static", "Simple Rate:", WS_CHILD | WS_VISIBLE, 5, y - 20, 100, 14,
                  hwnd, nullptr, hInstance, nullptr);
-    CreateWindow("static", "битрейт:", WS_CHILD | WS_VISIBLE, 5, y - 80, 100, 14,
+    CreateWindow("static", "битрейт:", WS_CHILD | WS_VISIBLE, 5, y - 50, 100, 14,
                  hwnd, nullptr, hInstance, nullptr);
-    CreateWindow("static", "длинна трека:", WS_CHILD | WS_VISIBLE, 5, y - 110, 100, 14,
+    CreateWindow("static", "длинна трека:", WS_CHILD | WS_VISIBLE, 5, y - 80, 100, 14,
                  hwnd, nullptr, hInstance, nullptr);
 
 
-    hCBox[0] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 10, x - 115, 20,
+    hCBox[0] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 10, x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[1] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 40, x - 115, 20,
+    hCBox[1] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 40, x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[2] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 70, x - 115, 20,
+    hCBox[2] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 70, x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[3] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 100, x - 115, 20,
+    hCBox[3] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 100, x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[4] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 130, x - 115, 20,
+    hCBox[4] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 130, x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[5] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 160, x - 115, 20,
+    hCBox[5] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 160, x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[6] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 200, 190, x - 210, 20,
+    hCBox[6] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 200, 190, x - 210, 90,
                             hwnd, nullptr, hInstance, nullptr);
     CreateWindow("button", "редактировать", WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 220, 120, 20, hwnd,
                  (HMENU) ID_BUTTON_EDIT, hInstance, nullptr);
+
+    CreateWindow("static", "456565", WS_CHILD | WS_VISIBLE, 105, y - 20, x - 115, 14,
+                 hwnd, nullptr, hInstance, nullptr);
+    CreateWindow("static", "6546848", WS_CHILD | WS_VISIBLE, 105, y - 50, x - 115, 14,
+                 hwnd, nullptr, hInstance, nullptr);
+    CreateWindow("static", "02:30", WS_CHILD | WS_VISIBLE | WS_BORDER, 105, y - 80, x - 115, 14,
+                 hwnd, nullptr, hInstance, nullptr);
 }
 
 void HideGUI() {
-    for (int i = 0; i < 7; i++) {
-        ShowWindow(hCBox[i], SW_HIDE);
+    for (auto &i : hCBox) {
+        ShowWindow(i, SW_HIDE);
     }
 }
+

@@ -7,7 +7,16 @@ using namespace std;
 
 void Add_MP3_Tag(wstring name) {
     TagLib::FileRef f(name.c_str());
-    tags.push_back(f);
+    file.emplace_back(File(ID, f));
+    strcpy(file[ID].loadLV[0], convert(file[ID].taglibFile.tag()->title().toCString(TRUE), "utf-8", "cp1251"));
+    strcpy(file[ID].loadLV[1], convert(file[ID].taglibFile.tag()->artist().toCString(TRUE), "utf-8", "cp1251"));
+    strcpy(file[ID].loadLV[2], convert(file[ID].taglibFile.tag()->album().toCString(TRUE), "utf-8", "cp1251"));
+    strcpy(file[ID].loadLV[3], convert(file[ID].taglibFile.tag()->genre().toCString(TRUE), "utf-8", "cp1251"));
+    strcpy(file[ID].loadLV[4], to_string(file[ID].taglibFile.tag()->year()).c_str());
+    strcpy(file[ID].loadLV[5], convert(file[ID].taglibFile.tag()->comment().toCString(TRUE), "utf-8", "cp1251"));
+    strcpy(file[ID].loadLV[6],
+           convert(file[ID].taglibFile.file()->name().toString().toCString(TRUE), "utf-8", "cp1251"));
+    ID++;
 }
 
 char *convert(const char *s, const char *from_cp, const char *to_cp) {

@@ -23,15 +23,13 @@
 #define ID_BUTTON_ADD          3001
 #define ID_BUTTON_DEL         3002
 
-int RegClass(void);
+int RegClass();
 
 void CreateGUIElements(HWND);
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 HWND CreateListView(HWND hwndParent);
-
-BOOL WINAPI AddListViewItems(HWND hWndLV, int colNum, int textMaxLen, char item[][400]);
 
 int SetListViewColumns(HWND hWndLV, int colNum, int textMaxLen, char **header);
 
@@ -51,6 +49,7 @@ void loadToEdit(TagLib::FileRef file);
 char szClassName[] = "MainClass";
 BROWSEINFOW brinfo;
 HINSTANCE hInstance;
+unsigned int ID = 0;
 
 MSG msg;
 HWND hMain, hListViev, hComboBox, hCBox[7];

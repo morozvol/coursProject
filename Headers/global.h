@@ -18,16 +18,18 @@
 
 #define ID_BUTTON_EDIT            1007
 #define ID_LW_RT_VIEW             1006
-struct File{
+extern unsigned int ID;
+
+struct File {
     TagLib::FileRef taglibFile;
     unsigned int id;
-    char Title[60]="";
-    char Name[60]="";
-    char Album[60]="";
-    char Genre[60]="";
-    char Comment[60]="";
-    char Year[10]="";
-    char Number[10]="";
+    char loadLV[7][400];
+    std::wstring path;
+
+    File(unsigned int id, TagLib::FileRef f) {
+        this->id = id;
+        this->taglibFile = f;
+    };
 };
 
 struct EditTag {
@@ -46,10 +48,12 @@ struct EditTag {
 extern HINSTANCE hInstance;
 extern HWND hMain, hListViev, hComboBox, hCBox[7];
 extern MSG msg;
-extern std::vector<TagLib::FileRef> tags;
+extern std::vector<File> file;
 
 void editTags();
 
 bool CreateEditWindow(int sX, int sY, int x, int y, HWND parent);
+
+BOOL WINAPI AddListViewItems(HWND hWndLV, int colNum, int textMaxLen, char item[][400]);
 
 #endif //COURSPROJECT_GLOBAL_H
