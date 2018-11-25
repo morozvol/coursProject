@@ -5,13 +5,9 @@
 #ifndef COURSPROJECT_READTAG_H
 #define COURSPROJECT_READTAG_H
 
-#include <iostream>
 #include <windows.h>
 #include "global.h"
-#include <vector>
-#include "fileref.h"
-#include "taglib.h"
-#include "tag.h"
+
 
 using namespace std;
 

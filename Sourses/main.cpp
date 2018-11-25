@@ -1,9 +1,15 @@
 #include <main.h>
 
+int quantity = 8;
 EditTag editMyTag;
 using namespace std;
-std::vector<File> file;
-std::vector<wstring> dirs;
+vector<File> file;
+vector<wstring> dirs;
+vector<vector<string>> edit;
+
+void clearEdit();
+
+void selectToEdit(vector<int> selected, LPARAM lParam);
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
     hInstance = hInst;
@@ -40,6 +46,7 @@ int RegClass() {
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch (message) {
         case WM_CREATE: {
+            edit.resize(7);
             break;
         }
         case WM_SIZE:
@@ -53,7 +60,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
             CreateGUIElements(hwnd);
             loadListView(hListViev);
 
-            // ListView_DeleteAllItems(hListViev);
             break;
         case WM_NOTIFY: {
             auto pnmhdr = (LPNMHDR) lParam;
@@ -76,18 +82,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 }
                 case LVN_ITEMCHANGED: {//Обработчик события выбора элемента
                     vector<int> i = GetSelectetItems();
-                    if (i.size() == 1) {
-                        for (auto &t : hCBox) {
-                            SendMessage(t, CB_RESETCONTENT, 0, 0L);
-                            SendMessage(t, CB_ADDSTRING, 0, (LPARAM) "");
-                        }
-                        loadToEdit(file[i[0]].taglibFile);
-                    } else {
-                        for (auto &t : hCBox) {
-                            SendMessage(t, CB_RESETCONTENT, 0, 0L);
-                            SendMessage(t, CB_ADDSTRING, 0, (LPARAM) "<оставить>");
-                        }
-                    }
+                    clearEdit();
+                    clearEditBuf();
+                    selectToEdit(i, lParam);
+                    loadToEdit();
+
+                    /*  for (auto &t : hCBox) {
+                          SendMessage(t, CB_ADDSTRING, 0, (LPARAM) "<оставить>");
+                      }*/
                     break;
                 }
                 default:
@@ -134,6 +136,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
             return DefWindowProc(hwnd, message, wParam, lParam);
         }
     }
+
     return 0;
 }
 
@@ -180,6 +183,7 @@ int SetListViewColumns(HWND hWndLV, int colNum, int textMaxLen, char **header) {
     lvc.cchTextMax = textMaxLen;
 
     for (int i = 0; i < colNum; i++) {
+        if (i == 7) lvc.cx = 0;
         lvc.pszText = header[i];
         index = ListView_InsertColumn(hWndLV, i, &lvc);
         if (index == -1) break;
@@ -199,15 +203,16 @@ HWND CreateListView(HWND hwndParent) {
                                   nullptr);
 
     ShowWindow(hlwRTView, SW_SHOW);
-    char *header[7] = {(char *) ("Название трека"),
+    char *header[8] = {(char *) ("Название трека"),
                        (char *) ("Артист"),
                        (char *) ("Альбом"),
                        (char *) ("Жанр"),
                        (char *) ("Год выпуска"),
                        (char *) ("Коментарий"),
-                       (char *) ("Путь к файлу")
+                       (char *) ("Путь к файлу"),
+                       (char *) ("ID")
     };
-    SetListViewColumns(hlwRTView, 7, 31, header);
+    SetListViewColumns(hlwRTView, quantity, 31, header);
     ListView_SetExtendedListViewStyle(hlwRTView,
                                       ListView_GetExtendedListViewStyle(hlwRTView) | LVS_EX_FULLROWSELECT |
                                       LVS_EX_GRIDLINES);
@@ -219,9 +224,9 @@ HWND CreateListView(HWND hwndParent) {
 void loadListView(HWND hwndParent) {
     ListView_DeleteAllItems(hwndParent);
     for (auto &f : file)
-        AddListViewItems(hListViev, 7, 400, f.loadLV);
+        AddListViewItems(hListViev, quantity, 400, f.loadLV);
     int s = SendMessage(hListViev, LVM_GETCOUNTPERPAGE, 0, 0);
-    char buffer[7][400];
+    char buffer[quantity][400];
     memset(buffer, 0, sizeof(buffer));
     strcmp(buffer[0], "");
     strcmp(buffer[1], "");
@@ -230,8 +235,9 @@ void loadListView(HWND hwndParent) {
     strcmp(buffer[4], "");
     strcmp(buffer[5], "");
     strcmp(buffer[6], "");
+    strcmp(buffer[7], "");
     for (int i = file.size(); i < s + 1; i++) {
-        AddListViewItems(hListViev, 7, 400, buffer);
+        AddListViewItems(hListViev, quantity, 400, buffer);
     }
 
 }
@@ -268,6 +274,7 @@ void update() {
 
 vector<int> GetSelectetItems() {
     vector<int> i;
+    i.clear();
     int iPos = ListView_GetNextItem(hListViev, -1, LVNI_SELECTED);
     while (iPos != -1 && iPos < file.size()) {
         i.push_back(iPos);
@@ -276,14 +283,15 @@ vector<int> GetSelectetItems() {
     return i;
 }
 
-void loadToEdit(TagLib::FileRef file) {
-    SetWindowText(hCBox[0], convert(file.tag()->title().toCString(TRUE), "utf-8", "cp1251"));
-    SetWindowText(hCBox[1], convert(file.tag()->artist().toCString(TRUE), "utf-8", "cp1251"));
-    SetWindowText(hCBox[2], convert(file.tag()->album().toCString(TRUE), "utf-8", "cp1251"));
-    SetWindowText(hCBox[3], convert(file.tag()->genre().toCString(TRUE), "utf-8", "cp1251"));
-    SetWindowText(hCBox[4], convert(file.tag()->comment().toCString(TRUE), "utf-8", "cp1251"));
-    SetWindowText(hCBox[5], to_string(file.tag()->year()).c_str());
-    SetWindowText(hCBox[6], to_string(file.tag()->track()).c_str());
+void loadToEdit() {
+    for (int i = 0; i < 7; i++) {
+        for (auto &v : edit[i])
+            SendMessage(hCBox[i], CB_ADDSTRING, 0, (LPARAM) v.c_str());
+        if (edit[i].size() == 1)
+            SetWindowText(hCBox[i], (LPCSTR) edit[i][0].c_str());
+        else if (!edit[i].empty())
+            SendMessage(hCBox[i], CB_INSERTSTRING, 0, (LPARAM) "<оставить>");
+    }
 }
 
 bool is_ok(int ok) {
@@ -291,22 +299,34 @@ bool is_ok(int ok) {
 }
 
 void updateFile(File *f) {
-
-    f->taglibFile.tag()->setTitle(string(editMyTag.Title));
-    f->taglibFile.tag()->setArtist(string(editMyTag.Name));
-    f->taglibFile.tag()->setAlbum(string(editMyTag.Album));
-    f->taglibFile.tag()->setGenre(string(editMyTag.Genre));
-    f->taglibFile.tag()->setComment(string(editMyTag.Comment));
-    f->taglibFile.tag()->setYear((unsigned int) stol(editMyTag.Year));
-    f->taglibFile.tag()->setTrack((unsigned int) stol(editMyTag.Number));
+    if (strcmp(editMyTag.Title, "<оставить>") != 0)
+        f->taglibFile.tag()->setTitle(string(editMyTag.Title));
+    if (strcmp(editMyTag.Name, "<оставить>") != 0)
+        f->taglibFile.tag()->setArtist(string(editMyTag.Name));
+    if (strcmp(editMyTag.Album, "<оставить>") != 0)
+        f->taglibFile.tag()->setAlbum(string(editMyTag.Album));
+    if (strcmp(editMyTag.Genre, "<оставить>") != 0)
+        f->taglibFile.tag()->setGenre(string(editMyTag.Genre));
+    if (strcmp(editMyTag.Comment, "<оставить>") != 0)
+        f->taglibFile.tag()->setComment(string(editMyTag.Comment));
+    if (strcmp(editMyTag.Year, "<оставить>") != 0)
+        f->taglibFile.tag()->setYear((unsigned int) stol(editMyTag.Year));
+    if (strcmp(editMyTag.Number, "<оставить>") != 0)
+        f->taglibFile.tag()->setTrack((unsigned int) stol(editMyTag.Number));
     f->taglibFile.save();
-
+    if (strcmp(editMyTag.Title, "<оставить>") != 0)
     strcpy(f->loadLV[0], editMyTag.Title);
+    if (strcmp(editMyTag.Name, "<оставить>") != 0)
     strcpy(f->loadLV[1], editMyTag.Name);
+    if (strcmp(editMyTag.Album, "<оставить>") != 0)
     strcpy(f->loadLV[2], editMyTag.Album);
+    if (strcmp(editMyTag.Genre, "<оставить>") != 0)
     strcpy(f->loadLV[3], editMyTag.Genre);
-    strcpy(f->loadLV[4], editMyTag.Comment);
-    strcpy(f->loadLV[5], editMyTag.Year);
+    if (strcmp(editMyTag.Comment, "<оставить>") != 0)
+    strcpy(f->loadLV[5], editMyTag.Comment);
+    if (strcmp(editMyTag.Year, "<оставить>") != 0)
+    strcpy(f->loadLV[4], editMyTag.Year);
+    if (strcmp(editMyTag.Number, "<оставить>") != 0)
     strcpy(f->loadLV[6], editMyTag.Number);
 }
 
@@ -327,8 +347,8 @@ void editTags() {
             GetWindowText(hCBox[2], editMyTag.Album, 30);
             GetWindowText(hCBox[3], editMyTag.Genre, 30);
             GetWindowText(hCBox[4], editMyTag.Comment, 30);
-            GetWindowText(hCBox[5], editMyTag.Year, 6);
-            GetWindowText(hCBox[6], editMyTag.Number, 5);
+            GetWindowText(hCBox[5], editMyTag.Year, 11);
+            GetWindowText(hCBox[6], editMyTag.Number, 11);
 
             for (int i : s) {
                 updateFile(&file[i]);
@@ -336,5 +356,57 @@ void editTags() {
             loadListView(hListViev);
         }
     }
+}
 
+void clearEdit() {
+    for (int i = 0; i < 7; i++) {
+        SendMessage(hCBox[i], CB_RESETCONTENT, 0, 0L);
+    }
+
+}
+
+bool is_finded(vector<string> vstr, string s) {
+    for (auto &vs : vstr) {
+        if (s.empty())return true;
+        if (vs == s)return true;
+    }
+    return false;
+}
+
+void selectToEdit(vector<int> selected, LPARAM lParam) {
+    char buf[60] = "123";
+    int id;
+    auto pnmhdr = (LPNMHDR) lParam;
+    for (auto &t : selected) {
+        for (int i = 0; i < 7; i++) {
+            ListView_GetItemText(pnmhdr->hwndFrom, t, i, buf, 10);
+            if (!is_finded(edit[i], string(buf)))
+                if (i == 4) {
+                    i++;
+                    if (!is_finded(edit[i], string(buf)))
+                    edit[i].emplace_back(string(buf));
+                    i--;
+                } else if (i == 5) {
+                    i--;
+                    if (!is_finded(edit[i], string(buf)))
+                    edit[i].emplace_back(string(buf));
+                    i++;
+                } else if (i == 6) {
+                    ListView_GetItemText(pnmhdr->hwndFrom, t, 7, buf, 10);
+                    id = atoi(buf);
+                    for (auto &f : file) {
+                        if (f.id == id)
+                            if (!is_finded(edit[6], string(buf)))
+                            edit[i].emplace_back(to_string(f.taglibFile.tag()->track()));
+                    }
+                } else { edit[i].emplace_back(string(buf)); }
+
+        }
+    }
+}
+
+void clearEditBuf() {
+    for (auto &e :edit) {
+        e.clear();
+    }
 }

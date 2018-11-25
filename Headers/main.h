@@ -6,22 +6,8 @@
 #define COURSPROJECT_MAIN_H
 
 #include "global.h"
-#include "Menu.h"
 #include "ReadTag.h"
-#include <iostream>
-#include <io.h>
-#include <stdio.h>
-#include <sys/stat.h>
-#include <commctrl.h>
 #include <shlobj.h>
-#include <taglib/fileref.h>
-#include "taglib/attachedpictureframe.h"
-#include <vector>
-
-
-#define ID_COMBOBOX_DIRS   3000
-#define ID_BUTTON_ADD          3001
-#define ID_BUTTON_DEL         3002
 
 int RegClass();
 
@@ -39,11 +25,12 @@ void loadFileFromFolders();
 
 void Dialog(HWND hwnd);
 
+void clearEditBuf();
+
 void update();
 
 vector<int> GetSelectetItems();
-
-void loadToEdit(TagLib::FileRef file);
+void loadToEdit();
 
 
 char szClassName[] = "MainClass";

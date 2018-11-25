@@ -12,6 +12,8 @@ void CreateEditElements(HWND hwnd);
 
 LRESULT CALLBACK EditProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+void setLimitEditText(int limit);
+
 void HideGUI();
 
 #endif //COURSPROJECT_WINDOWEDIT_H

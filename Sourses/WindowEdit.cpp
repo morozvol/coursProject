@@ -87,19 +87,26 @@ void CreateEditElements(HWND hwnd) {
                  hwnd, nullptr, hInstance, nullptr);
 
 
-    hCBox[0] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 10, x - 115, 90,
+    hCBox[0] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN | CBS_AUTOHSCROLL, 105, 10,
+                            x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[1] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 40, x - 115, 90,
+    hCBox[1] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN | CBS_AUTOHSCROLL, 105, 40,
+                            x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[2] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 70, x - 115, 90,
+    hCBox[2] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN | CBS_AUTOHSCROLL, 105, 70,
+                            x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[3] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 100, x - 115, 90,
+    hCBox[3] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN | CBS_AUTOHSCROLL, 105,
+                            100, x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[4] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 130, x - 115, 90,
+    hCBox[4] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN | CBS_AUTOHSCROLL, 105,
+                            130, x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[5] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 105, 160, x - 115, 90,
+    hCBox[5] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN | CBS_AUTOHSCROLL, 105,
+                            160, x - 115, 90,
                             hwnd, nullptr, hInstance, nullptr);
-    hCBox[6] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN, 200, 190, x - 210, 90,
+    hCBox[6] = CreateWindow("combobox", "", WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWN | CBS_AUTOHSCROLL, 200,
+                            190, x - 210, 90,
                             hwnd, nullptr, hInstance, nullptr);
     CreateWindow("button", "редактировать", WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 220, 120, 20, hwnd,
                  (HMENU) ID_BUTTON_EDIT, hInstance, nullptr);
@@ -110,6 +117,7 @@ void CreateEditElements(HWND hwnd) {
                  hwnd, nullptr, hInstance, nullptr);
     CreateWindow("static", "02:30", WS_CHILD | WS_VISIBLE | WS_BORDER, 105, y - 80, x - 115, 14,
                  hwnd, nullptr, hInstance, nullptr);
+    setLimitEditText(60);
 }
 
 void HideGUI() {
@@ -118,3 +126,8 @@ void HideGUI() {
     }
 }
 
+void setLimitEditText(int limit){
+    for (int i=0;i<7;i++){
+        SendMessage(hCBox[i],CB_LIMITTEXT,limit,0L);
+    }
+}

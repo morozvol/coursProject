@@ -10,7 +10,7 @@ include_directories(${PROJECT_DIR}/Headers)
 include_directories(${PROJECT_DIR}/Resours)
 include_directories(${PROJECT_DIR}/Sourses)
 
-add_executable(coursProject Sourses/main.cpp Sourses/ReadTag.cpp Resourses/Menu.rc Sourses/Settings.cpp Sourses/WindowEdit.cpp Headers/WindowEdit.h)
+add_executable(coursProject Sourses/main.cpp Sourses/ReadTag.cpp Resourses/Menu.rc Sourses/WindowEdit.cpp Headers/WindowEdit.h)
 
 include_directories(${TagLib_INCLUDE_DIR})
 include_directories(${TagLib_INCLUDE_DIR}/taglib)

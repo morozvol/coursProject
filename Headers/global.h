@@ -12,18 +12,14 @@
 #include <windows.h>
 #include <taglib/fileref.h>
 #include <vector>
+#include "resource.h"
 
-#define X GetSystemMetrics(SM_CXSCREEN)
-#define Y GetSystemMetrics(SM_CYSCREEN)
-
-#define ID_BUTTON_EDIT            1007
-#define ID_LW_RT_VIEW             1006
 extern unsigned int ID;
 
 struct File {
     TagLib::FileRef taglibFile;
     unsigned int id;
-    char loadLV[7][400];
+    char loadLV[8][400]{};
     std::wstring path;
 
     File(unsigned int id, TagLib::FileRef f) {
@@ -38,10 +34,8 @@ struct EditTag {
     char Album[60];
     char Genre[60];
     char Comment[60];
-    char Year[10];
-    char Number[10];
-
-    EditTag() {};
+    char Year[11];
+    char Number[11];
 };
 
 

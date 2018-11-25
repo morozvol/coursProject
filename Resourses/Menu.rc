@@ -1,7 +1,7 @@
 #include <windows.h>
  #include <commctrl.h>
  #include <richedit.h>
- #include "Menu.h"
+ #include "resource.h"
 
  LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
  IDR_MENU MENU
@@ -9,7 +9,6 @@
      POPUP "Файл"
      {
          MENUITEM "Добавить папку", MENU_OPEN_DIRECTORY
-         MENUITEM "Выбрать папку", MENU_CHOICE_DIRECTORY
          MENUITEM "Обновить", MENU_UPDATE
          MENUITEM SEPARATOR
          MENUITEM "Выйти", MENU_CLOSE
