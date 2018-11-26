@@ -7,6 +7,9 @@
 
 #include <windows.h>
 #include "global.h"
+#include <iconv.h>
+#include <tchar.h>
+#include <tfile.h>
 
 
 using namespace std;

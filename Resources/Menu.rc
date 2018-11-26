@@ -15,3 +15,4 @@
      }
       MENUITEM "Настройки", MENU_SETTINGS
  }
+ IDI_MY_ICON ICON "MP3.ico"

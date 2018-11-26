@@ -127,7 +127,7 @@ void HideGUI() {
 }
 
 void setLimitEditText(int limit){
-    for (int i=0;i<7;i++){
-        SendMessage(hCBox[i],CB_LIMITTEXT,limit,0L);
+    for (auto &i : hCBox) {
+        SendMessage(i,CB_LIMITTEXT,(WPARAM)limit,0L);
     }
 }

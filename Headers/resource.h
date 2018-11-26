@@ -19,5 +19,5 @@
 #define ID_COMBOBOX_DIRS                        507
 #define ID_BUTTON_ADD                           508
 #define ID_BUTTON_DEL                           509
-
+#define IDI_MY_ICON                             1
 #endif //COURSPROJECT_MENU_H

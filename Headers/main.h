@@ -29,7 +29,14 @@ void clearEditBuf();
 
 void update();
 
+void clearEdit();
+
+void selectToEdit(vector<int> selected, LPARAM lParam);
+
+bool is_leave(char *string);
+
 vector<int> GetSelectetItems();
+
 void loadToEdit();
 
 
@@ -39,7 +46,7 @@ HINSTANCE hInstance;
 unsigned int ID = 0;
 
 MSG msg;
-HWND hMain, hListViev, hComboBox, hCBox[7];
+HWND hMain, hListViev, hComboBox, hCBox[7],hButtonAdd,hButtonDel;
 wchar_t FileName[300];
 RECT rcClient;
 #endif //COURSPROJECT_MAIN_H

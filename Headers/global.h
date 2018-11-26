@@ -22,7 +22,7 @@ struct File {
     char loadLV[8][400]{};
     std::wstring path;
 
-    File(unsigned int id, TagLib::FileRef f) {
+    File(unsigned int id, const TagLib::FileRef &f) {
         this->id = id;
         this->taglibFile = f;
     };
@@ -47,6 +47,8 @@ extern std::vector<File> file;
 void editTags();
 
 bool CreateEditWindow(int sX, int sY, int x, int y, HWND parent);
+
+bool CreateSettingsWindow(HWND hWnd);
 
 BOOL WINAPI AddListViewItems(HWND hWndLV, int colNum, int textMaxLen, char item[][400]);
 

@@ -1,7 +1,5 @@
 #include "ReadTag.h"
-#include <iconv.h>
-#include <tchar.h>
-#include <tfile.h>
+
 
 using namespace std;
 
@@ -13,10 +11,11 @@ void Add_MP3_Tag(wstring name) {
     strcpy(file[ID].loadLV[1], convert(file[ID].taglibFile.tag()->artist().toCString(TRUE), "utf-8", "cp1251"));
     strcpy(file[ID].loadLV[2], convert(file[ID].taglibFile.tag()->album().toCString(TRUE), "utf-8", "cp1251"));
     strcpy(file[ID].loadLV[3], convert(file[ID].taglibFile.tag()->genre().toCString(TRUE), "utf-8", "cp1251"));
-    strcpy(file[ID].loadLV[4], to_string(file[ID].taglibFile.tag()->year()).c_str());
-    strcpy(file[ID].loadLV[5], convert(file[ID].taglibFile.tag()->comment().toCString(TRUE), "utf-8", "cp1251"));
+    strcpy(file[ID].loadLV[4], convert(file[ID].taglibFile.tag()->comment().toCString(TRUE), "utf-8", "cp1251"));
+    strcpy(file[ID].loadLV[5], to_string(file[ID].taglibFile.tag()->year()).c_str());
     strcpy(file[ID].loadLV[6], convert(file[ID].taglibFile.file()->name().toString().toCString(TRUE), "utf-8", "cp1251"));
     strcpy(file[ID].loadLV[7], to_string(file[ID].id).c_str());
+    file[ID].path=name;
     ID++;
 }
 

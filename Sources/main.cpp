@@ -7,16 +7,13 @@ vector<File> file;
 vector<wstring> dirs;
 vector<vector<string>> edit;
 
-void clearEdit();
-
-void selectToEdit(vector<int> selected, LPARAM lParam);
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
     hInstance = hInst;
     setlocale(LC_ALL, "");
     if (!RegClass()) return -1;
     HMENU hm = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU));
-    hMain = CreateWindow(szClassName, "редактор Мp3 тегов",
+    hMain = CreateWindowEx(WS_EX_STATICEDGE,szClassName, "редактор Мp3 тегов",
                          WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                          CW_USEDEFAULT, 8, (int) (X * 0.80), (int) (Y * 0.80), nullptr,
                          hm, hInstance, nullptr);
@@ -28,19 +25,20 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, in
 }
 
 int RegClass() {
-    WNDCLASS wc;
-    memset(&wc, 0, sizeof(WNDCLASS));
-    wc.style = CS_VREDRAW | CS_HREDRAW;
-    wc.lpfnWndProc = WndProc;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = hInstance;
-    wc.hIcon = LoadIcon(nullptr, IDI_WINLOGO);
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH) (1);
-    wc.lpszMenuName = (LPSTR) nullptr;
-    wc.lpszClassName = (LPSTR) szClassName;
-    return RegisterClass(&wc);
+    WNDCLASSEX wc;
+    wc.cbSize=sizeof(wc);
+    wc.cbClsExtra=0;
+    wc.cbWndExtra=0;
+    wc.hbrBackground=(HBRUSH) (1);
+    wc.hCursor=LoadCursor(nullptr,IDC_ARROW);
+    wc.hIcon= (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MY_ICON),IMAGE_ICON,128,128,0);
+    wc.hIconSm=(HICON) LoadImage(hInstance,MAKEINTRESOURCE(IDI_MY_ICON),IMAGE_ICON,16,16,0);
+    wc.hInstance=hInstance;
+    wc.lpfnWndProc=WndProc;
+    wc.lpszClassName=(LPSTR) szClassName;
+    wc.lpszMenuName=(LPSTR) nullptr;
+    wc.style=CS_HREDRAW | CS_VREDRAW;
+    return RegisterClassEx(&wc);
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -86,10 +84,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
                     clearEditBuf();
                     selectToEdit(i, lParam);
                     loadToEdit();
-
-                    /*  for (auto &t : hCBox) {
-                          SendMessage(t, CB_ADDSTRING, 0, (LPARAM) "<оставить>");
-                      }*/
                     break;
                 }
                 default:
@@ -112,6 +106,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
                     update();
                     break;
                 case MENU_SETTINGS:
+                    CreateSettingsWindow(hwnd);
                     break;
                 case MENU_CLOSE :
                     PostQuitMessage(0);
@@ -141,6 +136,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 }
 
 void CreateGUIElements(HWND hwnd) {
+    ShowWindow(hComboBox,SW_HIDE);
+    ShowWindow(hButtonAdd,SW_HIDE);
+    ShowWindow(hButtonDel,SW_HIDE);
     // GetWindowRect(hwnd,&rcClient);
     int wLV = (int) ((rcClient.right - rcClient.left) * 0.75);
     int hLV = (int) (rcClient.bottom - rcClient.top);
@@ -148,9 +146,9 @@ void CreateGUIElements(HWND hwnd) {
                              WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | CBS_DROPDOWN |
                              CBS_DROPDOWNLIST | CBS_SORT, 0, hLV - 25, wLV - 50, 120,
                              hwnd, (HMENU) ID_COMBOBOX_DIRS, hInstance, nullptr);
-    CreateWindow("button", "+", WS_CHILD | WS_VISIBLE, wLV - 25, hLV - 25, 25, 25,
+    hButtonAdd=CreateWindow("button", "+", WS_CHILD | WS_VISIBLE, wLV - 25, hLV - 25, 25, 25,
                  hwnd, (HMENU) ID_BUTTON_ADD, hInstance, nullptr);
-    CreateWindow("button", "-", WS_CHILD | WS_VISIBLE, wLV - 50, hLV - 25, 25, 25,
+    hButtonDel=CreateWindow("button", "-", WS_CHILD | WS_VISIBLE, wLV - 50, hLV - 25, 25, 25,
                  hwnd, (HMENU) ID_BUTTON_DEL, hInstance, nullptr);
 
 }
@@ -207,8 +205,8 @@ HWND CreateListView(HWND hwndParent) {
                        (char *) ("Артист"),
                        (char *) ("Альбом"),
                        (char *) ("Жанр"),
-                       (char *) ("Год выпуска"),
                        (char *) ("Коментарий"),
+                       (char *) ("Год выпуска"),
                        (char *) ("Путь к файлу"),
                        (char *) ("ID")
     };
@@ -299,35 +297,35 @@ bool is_ok(int ok) {
 }
 
 void updateFile(File *f) {
-    if (strcmp(editMyTag.Title, "<оставить>") != 0)
+    if (is_leave(editMyTag.Title))
         f->taglibFile.tag()->setTitle(string(editMyTag.Title));
-    if (strcmp(editMyTag.Name, "<оставить>") != 0)
+    if (is_leave(editMyTag.Name))
         f->taglibFile.tag()->setArtist(string(editMyTag.Name));
-    if (strcmp(editMyTag.Album, "<оставить>") != 0)
+    if (is_leave(editMyTag.Album))
         f->taglibFile.tag()->setAlbum(string(editMyTag.Album));
-    if (strcmp(editMyTag.Genre, "<оставить>") != 0)
+    if (is_leave(editMyTag.Genre))
         f->taglibFile.tag()->setGenre(string(editMyTag.Genre));
-    if (strcmp(editMyTag.Comment, "<оставить>") != 0)
+    if (is_leave(editMyTag.Comment))
         f->taglibFile.tag()->setComment(string(editMyTag.Comment));
-    if (strcmp(editMyTag.Year, "<оставить>") != 0)
+    if (is_leave(editMyTag.Year))
         f->taglibFile.tag()->setYear((unsigned int) stol(editMyTag.Year));
-    if (strcmp(editMyTag.Number, "<оставить>") != 0)
+    if (is_leave(editMyTag.Number))
         f->taglibFile.tag()->setTrack((unsigned int) stol(editMyTag.Number));
     f->taglibFile.save();
-    if (strcmp(editMyTag.Title, "<оставить>") != 0)
-    strcpy(f->loadLV[0], editMyTag.Title);
-    if (strcmp(editMyTag.Name, "<оставить>") != 0)
-    strcpy(f->loadLV[1], editMyTag.Name);
-    if (strcmp(editMyTag.Album, "<оставить>") != 0)
-    strcpy(f->loadLV[2], editMyTag.Album);
-    if (strcmp(editMyTag.Genre, "<оставить>") != 0)
-    strcpy(f->loadLV[3], editMyTag.Genre);
-    if (strcmp(editMyTag.Comment, "<оставить>") != 0)
-    strcpy(f->loadLV[5], editMyTag.Comment);
-    if (strcmp(editMyTag.Year, "<оставить>") != 0)
-    strcpy(f->loadLV[4], editMyTag.Year);
-    if (strcmp(editMyTag.Number, "<оставить>") != 0)
-    strcpy(f->loadLV[6], editMyTag.Number);
+    if (is_leave(editMyTag.Title))
+        strcpy(f->loadLV[0], editMyTag.Title);
+    if (is_leave(editMyTag.Name))
+        strcpy(f->loadLV[1], editMyTag.Name);
+    if (is_leave(editMyTag.Album))
+        strcpy(f->loadLV[2], editMyTag.Album);
+    if (is_leave(editMyTag.Genre))
+        strcpy(f->loadLV[3], editMyTag.Genre);
+    if (is_leave(editMyTag.Comment))
+        strcpy(f->loadLV[4], editMyTag.Comment);
+    if (is_leave(editMyTag.Year))
+        strcpy(f->loadLV[5], editMyTag.Year);
+    if (is_leave(editMyTag.Number))
+        strcpy(f->loadLV[6], editMyTag.Number);
 }
 
 void editTags() {
@@ -359,48 +357,40 @@ void editTags() {
 }
 
 void clearEdit() {
-    for (int i = 0; i < 7; i++) {
-        SendMessage(hCBox[i], CB_RESETCONTENT, 0, 0L);
+    for (auto &i : hCBox) {
+        SendMessage(i, CB_RESETCONTENT, 0, 0L);
     }
 
 }
 
-bool is_finded(vector<string> vstr, string s) {
+bool is_finded(vector<string> vstr, const string &s) {
     for (auto &vs : vstr) {
         if (s.empty())return true;
         if (vs == s)return true;
     }
     return false;
 }
-
+char buf[60] = "123";
 void selectToEdit(vector<int> selected, LPARAM lParam) {
-    char buf[60] = "123";
     int id;
     auto pnmhdr = (LPNMHDR) lParam;
     for (auto &t : selected) {
         for (int i = 0; i < 7; i++) {
-            ListView_GetItemText(pnmhdr->hwndFrom, t, i, buf, 10);
-            if (!is_finded(edit[i], string(buf)))
-                if (i == 4) {
-                    i++;
-                    if (!is_finded(edit[i], string(buf)))
-                    edit[i].emplace_back(string(buf));
-                    i--;
-                } else if (i == 5) {
-                    i--;
-                    if (!is_finded(edit[i], string(buf)))
-                    edit[i].emplace_back(string(buf));
-                    i++;
-                } else if (i == 6) {
-                    ListView_GetItemText(pnmhdr->hwndFrom, t, 7, buf, 10);
-                    id = atoi(buf);
+            ListView_GetItemText(pnmhdr->hwndFrom, t, i, buf, 60);
+            if (!is_finded(edit[i], string(buf))){
+                if (i == 6) {
+                    ListView_GetItemText(pnmhdr->hwndFrom, t, 7, buf, 60);
+                  id=stoi(string(buf),nullptr,10);
                     for (auto &f : file) {
                         if (f.id == id)
-                            if (!is_finded(edit[6], string(buf)))
-                            edit[i].emplace_back(to_string(f.taglibFile.tag()->track()));
+                            if (!is_finded(edit[6], string(buf))) {
+                                edit[i].emplace_back(to_string(f.taglibFile.tag()->track()));
+                                break;
+                            }
                     }
-                } else { edit[i].emplace_back(string(buf)); }
-
+                } else
+                    edit[i].emplace_back(string(buf));
+            }
         }
     }
 }
@@ -409,4 +399,8 @@ void clearEditBuf() {
     for (auto &e :edit) {
         e.clear();
     }
+}
+
+bool is_leave(char *string) {
+    return (strcmp(string, "<оставить>") != 0);
 }
